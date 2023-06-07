@@ -77,12 +77,13 @@ async function run() {
 
     // Get classes data on enrolled descending order
     app.get("/popularclasses", async (req, res) => {
-      const result = await classesCollection
-        .find()
-        .sort({ enrolled: -1 })
-        .toArray();
-      res.send(result);
-    });
+  // const query = { status: "approved" };
+  const options = { sort: { enrolled: -1 } };
+
+  const result = await classesCollection.find(query, options).toArray();
+  res.send(result);
+});
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
