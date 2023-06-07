@@ -100,6 +100,17 @@ async function run() {
       res.send(result);
     });
 
+    // Get Popular Instructors from the database
+    app.get("/popularInstructors", async (req, res) => {
+      const query = { role: "instructor" };
+      const options = { sort: { students: -1 } };
+      const result = await usersCollection
+        .find(query, options)
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
