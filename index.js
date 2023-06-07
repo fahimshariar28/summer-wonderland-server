@@ -121,7 +121,8 @@ async function run() {
 
       const query = { email: email };
       const user = await usersCollection.findOne(query);
-      const result = { admin: user?.role === "student" };
+      console.log(user);
+      const result = { student: user?.role === "student" };
       res.send(result);
     });
 
