@@ -75,6 +75,14 @@ async function run() {
       res.send(result);
     });
 
+// Get all classes data 
+ app.get("/classes", async (req, res) => {
+  // const query = { status: "approved" };
+  
+  const result = await classesCollection.find(query).toArray();
+  res.send(result);
+});
+
     // Get classes data on enrolled descending order
     app.get("/popularclasses", async (req, res) => {
   // const query = { status: "approved" };
