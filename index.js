@@ -75,12 +75,20 @@ async function run() {
       res.send(result);
     });
 
+    // Get all classes data
+    app.get("/classes", async (req, res) => {
+      const query = { status: "approved" };
+
+      const result = await classesCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // Get classes data on enrolled descending order
-    app.get("/popularclasses", async (req, res) => {
-      const result = await classesCollection
-        .find()
-        .sort({ enrolled: -1 })
-        .toArray();
+    app.get("/popularClasses", async (req, res) => {
+      const query = { status: "approved" };
+      const options = { sort: { enrolled: -1 } };
+
+      const result = await classesCollection.find(query, options).toArray();
       res.send(result);
     });
 
