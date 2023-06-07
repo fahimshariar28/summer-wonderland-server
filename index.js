@@ -51,6 +51,9 @@ async function run() {
       .db("summer-wonderland")
       .collection("classes");
     const usersCollection = client.db("summer-wonderland").collection("users");
+    const selectedClassCollection = client
+      .db("summer-wonderland")
+      .collection("selectedClass");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -121,7 +124,6 @@ async function run() {
 
       const query = { email: email };
       const user = await usersCollection.findOne(query);
-      console.log(user);
       const result = { student: user?.role === "student" };
       res.send(result);
     });
@@ -151,6 +153,13 @@ async function run() {
       const query = { email: email };
       const user = await usersCollection.findOne(query);
       const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
+    // Post selected class to the database
+    app.post("/selectClass", async (req, res) => {
+      const selectClass = req.body;
+      const result = await selectedClassCollection.insertOne(selectClass);
       res.send(result);
     });
 
