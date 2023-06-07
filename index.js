@@ -61,6 +61,20 @@ async function run() {
       res.send({ token });
     });
 
+    // Add users to the database
+    app.post("/adduser", async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email };
+      const existingUser = await usersCollection.findOne(query);
+
+      if (existingUser) {
+        return res.send({ message: "user already exists" });
+      }
+
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
     // Get classes data on enrolled descending order
     app.get("/popularclasses", async (req, res) => {
       const result = await classesCollection
