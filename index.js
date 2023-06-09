@@ -224,13 +224,50 @@ async function run() {
       const insertResult = await paymentCollection.insertOne(payment);
 
       const deleteQuery = {
-        _id: { $in: payment.selectedClassId.map((id) => new ObjectId(id)) },
+        _id: new ObjectId(payment.selectedClassId),
       };
-      const deleteResult = await selectedClassCollection.deleteMany(
-        deleteQuery
+      const deleteResult = await selectedClassCollection.deleteOne(deleteQuery);
+
+      const updateQuery = {
+        _id: new ObjectId(payment.classId),
+      };
+      const updateResult = await classesCollection.updateOne(updateQuery, {
+        $inc: { enrolled: 1 },
+      });
+
+      const updateSeatsQuery = {
+        _id: new ObjectId(payment.classId),
+      };
+      const updateSeatsResult = await classesCollection.updateOne(
+        updateSeatsQuery,
+        {
+          $inc: { available_seats: -1 },
+        }
       );
 
-      res.send({ insertResult, deleteResult });
+      const classId = payment.classId;
+      const query = { _id: new ObjectId(classId) };
+
+      const classData = await classesCollection.findOne(query);
+      const instructorEmail = classData.email;
+
+      const updateInstructorQuery = { email: instructorEmail };
+
+      // if instructor has no students field, create one
+      const updateInstructorResult = await usersCollection.updateOne(
+        updateInstructorQuery,
+        {
+          $inc: { students: 1 },
+        }
+      );
+
+      res.send({
+        insertResult,
+        deleteResult,
+        updateResult,
+        updateSeatsResult,
+        updateInstructorResult,
+      });
     });
 
     // Admin Routes
