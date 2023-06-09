@@ -73,7 +73,7 @@ async function run() {
       const email = req.decoded.email;
       const query = { email: email };
       const user = usersCollection.findOne(query);
-      if (user.role !== "admin") {
+      if (user?.role !== "admin") {
         return res
           .status(401)
           .send({ error: true, message: "unauthorized access" });
@@ -231,6 +231,13 @@ async function run() {
       );
 
       res.send({ insertResult, deleteResult });
+    });
+
+    // Admin Routes
+    // Get all users
+    app.get("/users", verifyJWT, verifyAdminJWT, async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
