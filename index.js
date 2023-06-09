@@ -68,6 +68,19 @@ async function run() {
       res.send({ token });
     });
 
+    // verify admin jwt
+    const verifyAdminJWT = (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = usersCollection.findOne(query);
+      if (user.role !== "admin") {
+        return res
+          .status(401)
+          .send({ error: true, message: "unauthorized access" });
+      }
+      next();
+    };
+
     // Add users to the database
     app.post("/adduser", async (req, res) => {
       const user = req.body;
