@@ -31,7 +31,7 @@ const verifyJWT = (req, res, next) => {
   });
 };
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.kf4yrvq.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -55,6 +55,9 @@ async function run() {
     const selectedClassCollection = client
       .db("summer-wonderland")
       .collection("selectedClass");
+    const paymentCollection = client
+      .db("summer-wonderland")
+      .collection("payment");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -181,7 +184,7 @@ async function run() {
     });
 
     // Crete payment intent
-    app.post("/create-payment-intent", async (req, res) => {
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const { classPrice } = req.body;
       const amount = classPrice * 100;
       const paymentIntent = await stripe.paymentIntents.create({
@@ -192,6 +195,21 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    // Post payment to the database
+    app.post("/payment", verifyJWT, async (req, res) => {
+      const payment = req.body;
+      const insertResult = await paymentCollection.insertOne(payment);
+
+      const deleteQuery = {
+        _id: { $in: payment.selectedClassId.map((id) => new ObjectId(id)) },
+      };
+      const deleteResult = await selectedClassCollection.deleteMany(
+        deleteQuery
+      );
+
+      res.send({ insertResult, deleteResult });
     });
 
     // Send a ping to confirm a successful connection
