@@ -163,6 +163,22 @@ async function run() {
       res.send(result);
     });
 
+    // Get selected class from the database by email
+    app.get("/selectedClass", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      if (!email) return res.send([]);
+
+      if (req.decoded.email !== email) {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden access" });
+      }
+
+      const query = { email: email };
+      const result = await selectedClassCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
