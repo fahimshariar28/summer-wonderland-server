@@ -69,10 +69,11 @@ async function run() {
     });
 
     // verify admin jwt
-    const verifyAdminJWT = (req, res, next) => {
+    const verifyAdminJWT = async (req, res, next) => {
       const email = req.decoded.email;
       const query = { email: email };
-      const user = usersCollection.findOne(query);
+      const user = await usersCollection.findOne(query);
+      console.log({ user });
       if (user?.role !== "admin") {
         return res
           .status(401)
