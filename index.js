@@ -270,6 +270,24 @@ async function run() {
       });
     });
 
+    // Get paid classes from the database by email
+    app.get("/paidClasses", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        return res.send([]);
+      }
+
+      if (req.decoded.email !== email) {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden access" });
+      }
+
+      const query = { email: email };
+      const result = await paymentCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // Admin Routes
     // Get all users
     app.get("/users", verifyJWT, verifyAdminJWT, async (req, res) => {
