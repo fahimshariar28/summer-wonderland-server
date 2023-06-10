@@ -315,6 +315,29 @@ async function run() {
       res.send(result);
     });
 
+    // Change user role to admin
+    app.put("/makeAdmin/:id", verifyJWT, verifyAdminJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const update = { $set: { role: "admin" } };
+      const result = await usersCollection.updateOne(query, update);
+      res.send(result);
+    });
+
+    // Change user role to instructor
+    app.put(
+      "/makeInstructor/:id",
+      verifyJWT,
+      verifyAdminJWT,
+      async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const update = { $set: { role: "instructor" } };
+        const result = await usersCollection.updateOne(query, update);
+        res.send(result);
+      }
+    );
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
