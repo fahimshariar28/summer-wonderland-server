@@ -73,8 +73,20 @@ async function run() {
       const email = req.decoded.email;
       const query = { email: email };
       const user = await usersCollection.findOne(query);
-      console.log({ user });
       if (user?.role !== "admin") {
+        return res
+          .status(401)
+          .send({ error: true, message: "unauthorized access" });
+      }
+      next();
+    };
+
+    // verify instructor jwt
+    const verifyInstructorJWT = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user?.role !== "instructor") {
         return res
           .status(401)
           .send({ error: true, message: "unauthorized access" });
@@ -305,6 +317,14 @@ async function run() {
       const query = { email: email };
       const sort = { date: -1 };
       const result = await paymentCollection.find(query).sort(sort).toArray();
+      res.send(result);
+    });
+
+    // Instructor Routes
+    // Post class to the database
+    app.post("/addClass", verifyJWT, verifyInstructorJWT, async (req, res) => {
+      const newClass = req.body;
+      const result = await classesCollection.insertOne(newClass);
       res.send(result);
     });
 
