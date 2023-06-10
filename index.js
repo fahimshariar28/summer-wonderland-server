@@ -328,6 +328,19 @@ async function run() {
       res.send(result);
     });
 
+    //Get instructor classes from the database by email using instructorJWT
+    app.get(
+      "/instructorClasses",
+      verifyJWT,
+      verifyInstructorJWT,
+      async (req, res) => {
+        const email = req.query.email;
+        const query = { email: email };
+        const result = await classesCollection.find(query).toArray();
+        res.send(result);
+      }
+    );
+
     // Admin Routes
     // Get all users
     app.get("/users", verifyJWT, verifyAdminJWT, async (req, res) => {
