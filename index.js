@@ -377,6 +377,20 @@ async function run() {
       }
     );
 
+    // Make class status field value to approved
+    app.put(
+      "/approveClass/:id",
+      verifyJWT,
+      verifyAdminJWT,
+      async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const update = { $set: { status: "approved" } };
+        const result = await classesCollection.updateOne(query, update);
+        res.send(result);
+      }
+    );
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
