@@ -385,17 +385,21 @@ async function run() {
       async (req, res) => {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
-        const update = { $set: { status: "approved" } };
+        const update = {
+          $set: { status: "approved", feedback: req.body.feedback },
+        };
         const result = await classesCollection.updateOne(query, update);
         res.send(result);
       }
     );
 
-    // Make class status field value to rejected
+    // Make class status field value to rejected and add a field named feedback
     app.put("/rejectClass/:id", verifyJWT, verifyAdminJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const update = { $set: { status: "rejected" } };
+      const update = {
+        $set: { status: "rejected", feedback: req.body.feedback },
+      };
       const result = await classesCollection.updateOne(query, update);
       res.send(result);
     });
